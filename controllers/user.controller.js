@@ -5,6 +5,7 @@ const {
   toggleHabitService,
   listOfHabitsService,
   listOfOffDaysDropdownService,
+  getUserProfileService,
 } = require("../services/user.service");
 const { handleError } = require("../utils/error.handler");
 
@@ -95,6 +96,20 @@ const toggleHabit = async (req, res) => {
   }
 };
 
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = await getUserProfileService(userId);
+    return res.status(200).json({
+      responseCode: 200,
+      message: "user details fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return handleError(res, error, "getUserDetails");
+  }
+};
+
 module.exports = {
   signup,
   signIn,
@@ -102,4 +117,5 @@ module.exports = {
   createHabit,
   listOfHabits,
   toggleHabit,
+  getUserProfile,
 };

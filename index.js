@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-
+require("./cron-jobs/cronJobs");
 const connectDB = require("./config/db");
 const routes = require("./routers");
 

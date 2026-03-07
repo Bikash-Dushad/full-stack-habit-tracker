@@ -56,7 +56,10 @@ const signInService = async (payload) => {
     id: user.id,
   };
   let token = createToken(tokenPayload);
-  return token;
+  const data = {
+    token,
+  };
+  return data;
 };
 
 const listOfOffDaysDropdownService = async () => {
@@ -88,7 +91,7 @@ const createHabitService = async (payload) => {
   if (habit) {
     throw new Error("Habit already exists");
   }
-  const metadata = await datesTillSaturday(offDays);
+  const metadata = datesTillSaturday(offDays);
 
   const newHabit = new HabitModel({
     user: userId,
@@ -106,6 +109,12 @@ const listOfHabitsService = async (userId) => {
   }
   const weekStart = moment().startOf("week").toDate(); // Sunday
   const weekEnd = moment().endOf("week").toDate(); // Saturday
+
+  const weekStartFormatted = moment(weekStart).format("YYYY-MM-DD");
+  const weekEndFormatted = moment(weekEnd).format("YYYY-MM-DD");
+
+  console.log("Week Start:", weekStartFormatted);
+  console.log("Week End:", weekEndFormatted);
 
   const habits = await HabitModel.aggregate([
     {
@@ -212,6 +221,17 @@ const getSingleHabitService = async (payload) => {
   return habit;
 };
 
+const getUserProfileService = async (userId) => {
+  if (!userId) {
+    throw new Error("userId is required");
+  }
+  const userDetails = await UserModel.findById(userId).select("-password");
+  if (!userDetails) {
+    throw new Error("User not found");
+  }
+  return userDetails;
+};
+
 module.exports = {
   signupService,
   signInService,
@@ -221,4 +241,5 @@ module.exports = {
   toggleHabitService,
   deleteHabitService,
   getSingleHabitService,
+  getUserProfileService,
 };

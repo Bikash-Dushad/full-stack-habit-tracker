@@ -1,6 +1,6 @@
 const moment = require("moment");
 
-const datesTillSaturday = async (offDays = []) => {
+const datesTillSaturday = (offDays = []) => {
   const today = moment();
   const saturday = today.clone().day(6);
 
