@@ -1,7 +1,7 @@
 const moment = require("moment");
 
 const datesTillSaturday = (offDays = []) => {
-  const today = moment();
+  const today = moment.utc();
   const saturday = today.clone().day(6);
 
   if (today.day() === 0) {

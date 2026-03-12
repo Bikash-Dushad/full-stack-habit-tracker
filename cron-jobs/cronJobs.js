@@ -32,8 +32,8 @@ const addDatesToHabit = async () => {
   }
 };
 
-cron.schedule("0 0 * * 6", addDatesToHabit, { timezone: "UTC" });
-
+// cron.schedule("7 0 * * 0", addDatesToHabit, { timezone: "UTC" });
+// cron.schedule("* * * * *", addDatesToHabit, { timezone: "UTC" });
 module.exports = {
   addDatesToHabit,
 };

@@ -107,8 +107,8 @@ const listOfHabitsService = async (userId) => {
   if (!userId) {
     throw new Error("UserId is required");
   }
-  const weekStart = moment().startOf("week").toDate(); // Sunday
-  const weekEnd = moment().endOf("week").toDate(); // Saturday
+  const weekStart = moment.utc().startOf("week").toDate(); // Sunday
+  const weekEnd = moment.utc().endOf("week").toDate(); // Saturday
 
   const weekStartFormatted = moment(weekStart).format("YYYY-MM-DD");
   const weekEndFormatted = moment(weekEnd).format("YYYY-MM-DD");
@@ -169,6 +169,7 @@ const toggleHabitService = async (payload) => {
   if (!habit) {
     throw new Error("Habit or metadata not found");
   }
+  console.log(habit);
 
   const metadata = habit.metadata.id(metadataId);
   const todayStart = moment.utc().startOf("day").toDate();
@@ -232,6 +233,11 @@ const getUserProfileService = async (userId) => {
   return userDetails;
 };
 
+const getTotalUsersService = async () => {
+  const totalUsers = await UserModel.countDocuments({});
+  return totalUsers;
+};
+
 module.exports = {
   signupService,
   signInService,
@@ -242,4 +248,5 @@ module.exports = {
   deleteHabitService,
   getSingleHabitService,
   getUserProfileService,
+  getTotalUsersService,
 };
