@@ -16,6 +16,13 @@ routes.forEach(({ path, router }) => {
   app.use(`/api${path}`, router);
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date(),
+  });
+});
+
 connectDB()
   .then(() => {
     console.log("Connected to MongoDB");
