@@ -10,6 +10,35 @@ const {
   toggleHabitValidation,
 } = require("../validators/user.validator");
 const { datesTillSaturday } = require("../helper/helper");
+const { cloudinary } = require("../config/cloudnary");
+const streamifier = require("streamifier");
+
+const imageUploadService = async (file) => {
+  if (!file) throw new Error("file is required");
+  const originalName = file.originalname
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
+
+  const fileName = `${Date.now()}-${originalName}`;
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        public_id: fileName,
+        folder: "habit-tracker",
+        resource_type: "image",
+        quality: "auto",
+        fetch_format: "auto",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      },
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+};
 
 const signupService = async (payload) => {
   const { name, email, avatar, password, confirmPassword } = payload;
@@ -239,6 +268,7 @@ const getTotalUsersService = async () => {
 };
 
 module.exports = {
+  imageUploadService,
   signupService,
   signInService,
   listOfOffDaysDropdownService,

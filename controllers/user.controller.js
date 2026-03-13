@@ -7,8 +7,23 @@ const {
   listOfOffDaysDropdownService,
   getUserProfileService,
   getTotalUsersService,
+  imageUploadService,
 } = require("../services/user.service");
 const { handleError } = require("../utils/error.handler");
+
+const imageUpload = async (req, res) => {
+  try {
+    const file = req.file;
+    const data = await imageUploadService(file);
+    return res.status(200).json({
+      responseCode: 200,
+      message: "file uploaded successfully",
+      data,
+    });
+  } catch (error) {
+    return handleError(res, error, "imageUpload");
+  }
+};
 
 const signup = async (req, res) => {
   try {
@@ -125,6 +140,7 @@ const totalUsers = async (req, res) => {
 };
 
 module.exports = {
+  imageUpload,
   signup,
   signIn,
   listOfOffDaysDropdown,

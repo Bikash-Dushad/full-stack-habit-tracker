@@ -8,9 +8,13 @@ const {
   listOfOffDaysDropdown,
   getUserProfile,
   totalUsers,
+  imageUpload,
 } = require("../controllers/user.controller");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const userRouter = express.Router();
+let multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 userRouter.post("/signup", signup);
 userRouter.post("/signin", signIn);
@@ -20,5 +24,6 @@ userRouter.get("/list-of-habit", authMiddleware, listOfHabits);
 userRouter.post("/toggle-habit", authMiddleware, toggleHabit);
 userRouter.get("/get-user-profile", authMiddleware, getUserProfile);
 userRouter.get("/get-total-users", totalUsers);
+userRouter.post("/image-upload", upload.single("file"), imageUpload);
 
 module.exports = userRouter;
