@@ -12,9 +12,22 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      default: "",
     },
     avatar: {
+      type: String,
+      default: "",
+    },
+    provider: {
+      type: String,
+      enum: ["local", "google", "facebook"],
+      default: "local",
+    },
+    googleProfilePicture: {
+      type: String,
+      default: "",
+    },
+    googleId: {
       type: String,
       default: "",
     },

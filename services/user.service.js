@@ -142,9 +142,6 @@ const listOfHabitsService = async (userId) => {
   const weekStartFormatted = moment(weekStart).format("YYYY-MM-DD");
   const weekEndFormatted = moment(weekEnd).format("YYYY-MM-DD");
 
-  console.log("Week Start:", weekStartFormatted);
-  console.log("Week End:", weekEndFormatted);
-
   const habits = await HabitModel.aggregate([
     {
       $match: {
@@ -198,7 +195,6 @@ const toggleHabitService = async (payload) => {
   if (!habit) {
     throw new Error("Habit or metadata not found");
   }
-  console.log(habit);
 
   const metadata = habit.metadata.id(metadataId);
   const todayStart = moment.utc().startOf("day").toDate();
