@@ -9,6 +9,7 @@ const {
   getUserProfile,
   totalUsers,
   imageUpload,
+  dashboard,
 } = require("../controllers/user.controller");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const userRouter = express.Router();
@@ -25,5 +26,6 @@ userRouter.post("/toggle-habit", authMiddleware, toggleHabit);
 userRouter.get("/get-user-profile", authMiddleware, getUserProfile);
 userRouter.get("/get-total-users", totalUsers);
 userRouter.post("/image-upload", upload.single("file"), imageUpload);
+userRouter.get("/dashboard", authMiddleware, dashboard);
 
 module.exports = userRouter;

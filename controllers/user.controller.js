@@ -8,6 +8,7 @@ const {
   getUserProfileService,
   getTotalUsersService,
   imageUploadService,
+  dashboardService,
 } = require("../services/user.service");
 const { handleError } = require("../utils/error.handler");
 
@@ -139,6 +140,20 @@ const totalUsers = async (req, res) => {
   }
 };
 
+const dashboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = await dashboardService(userId);
+    return res.status(200).json({
+      responseCode: 200,
+      message: "Dashboard fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return handleError(res, error, "dashboard");
+  }
+};
+
 module.exports = {
   imageUpload,
   signup,
@@ -149,4 +164,5 @@ module.exports = {
   toggleHabit,
   getUserProfile,
   totalUsers,
+  dashboard,
 };

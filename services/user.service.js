@@ -263,6 +263,127 @@ const getTotalUsersService = async () => {
   return totalUsers;
 };
 
+const dashboardService = async (userId) => {
+  if (!userId) {
+    throw new Error("UserId is required");
+  }
+
+  const habits = await HabitModel.find({
+    user: userId,
+    isActive: true,
+    isDeleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!habits || habits.length === 0) {
+    return [];
+  }
+
+  const allMonths = new Set();
+  habits.forEach((habit) => {
+    habit.metadata.forEach((entry) => {
+      const date = new Date(entry.date);
+      const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+      allMonths.add(monthKey);
+    });
+  });
+
+  const months = Array.from(allMonths).sort();
+
+  const graphData = habits.map((habit) => {
+    const sortedMetadata = [...habit.metadata].sort(
+      (a, b) => new Date(a.date) - new Date(b.date),
+    );
+
+    const monthlyStats = {};
+
+    months.forEach((month) => {
+      monthlyStats[month] = {
+        month,
+        totalDays: 0,
+        completedDays: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        completionRate: 0,
+      };
+    });
+
+    let currentStreak = 0;
+    let lastCompletedDate = null;
+    let currentMonth = null;
+
+    sortedMetadata.forEach((entry) => {
+      const date = new Date(entry.date);
+      const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+
+      if (currentMonth && currentMonth !== monthKey) {
+        currentStreak = 0;
+        lastCompletedDate = null;
+      }
+      currentMonth = monthKey;
+
+      if (monthlyStats[monthKey]) {
+        if (entry.isOffDay === true) {
+        } else {
+          monthlyStats[monthKey].totalDays++;
+
+          if (entry.status === true) {
+            monthlyStats[monthKey].completedDays++;
+
+            if (lastCompletedDate) {
+              const lastDate = new Date(lastCompletedDate);
+              const currentDate = new Date(date);
+
+              lastDate.setUTCHours(0, 0, 0, 0);
+              currentDate.setUTCHours(0, 0, 0, 0);
+
+              const dayDiff = (currentDate - lastDate) / (1000 * 60 * 60 * 24);
+
+              if (dayDiff === 1) {
+                currentStreak++;
+              } else if (dayDiff > 1) {
+                currentStreak = 1;
+              }
+            } else {
+              currentStreak = 1;
+            }
+
+            lastCompletedDate = date;
+
+            if (currentStreak > monthlyStats[monthKey].longestStreak) {
+              monthlyStats[monthKey].longestStreak = currentStreak;
+            }
+          } else {
+            currentStreak = 0;
+            lastCompletedDate = null;
+          }
+
+          monthlyStats[monthKey].currentStreak = currentStreak;
+        }
+      }
+    });
+
+    Object.values(monthlyStats).forEach((stat) => {
+      if (stat.totalDays > 0) {
+        stat.completionRate = Number(
+          ((stat.completedDays / stat.totalDays) * 100).toFixed(1),
+        );
+      }
+    });
+
+    return {
+      habitName: habit.name,
+      habitId: habit._id,
+      monthlyData: Object.values(monthlyStats).sort((a, b) =>
+        a.month.localeCompare(b.month),
+      ),
+    };
+  });
+
+  return {
+    habits: graphData,
+  };
+};
+
 module.exports = {
   imageUploadService,
   signupService,
@@ -275,4 +396,5 @@ module.exports = {
   getSingleHabitService,
   getUserProfileService,
   getTotalUsersService,
+  dashboardService,
 };
